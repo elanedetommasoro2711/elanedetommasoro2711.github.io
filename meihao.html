@@ -15,16 +15,35 @@
             font-size: 16px;
             color:#333;
         }
-        .loading {
-            color:#666;
+        h3 {
+            font-size: 48px;
+            color:#222;
+        }
+        .tip-text {
+            font-size: 32px;
+            color:#667788;
+        }
+        .error-text {
+            font-size: 42px;
+            color:red;
+            margin-top:30px;
+        }
+        .link-box {
+            margin-top:24px;
+            font-size:24px;
+        }
+        #manualLink {
+            color:#0066cc;
+            display:none;
         }
     </style>
 </head>
 <body>
     <div>
         <h3>正在跳转注册页面，请稍候...</h3>
-        <p class="loading">如长时间未跳转，请复制链接手动访问</p>
-        <p><a id="manualLink" style="color:#0066cc;display:none;">点击手动访问</a></p>
+        <p class="tip-text">如长时间未跳转，请复制链接手动访问</p>
+        <p class="link-box"><a id="manualLink">点击手动访问</a></p>
+        <p class="error-text" id="errorMsg"></p>
     </div>
 
 <script>
@@ -47,30 +66,33 @@ function getRandomDomain(){
 }
 
 (function(){
-    // 获取 ? 后面所有内容 例：/register.php?invite=180
     const queryRaw = window.location.search.slice(1);
     let inviteCode = DEFAULT_INVITE;
 
     if(queryRaw){
-        // 把参数部分转为可解析对象
-        const innerParams = new URLSearchParams(queryRaw);
+        // 关键修复：截取最后一段 ?invite=xxx
+        const realParamStr = queryRaw.split("?").pop();
+        const innerParams = new URLSearchParams(realParamStr);
         inviteCode = innerParams.get('invite') || DEFAULT_INVITE;
     }
 
+    const errorDom = document.getElementById("errorMsg");
+    const linkDom = document.getElementById('manualLink');
+
     if(!inviteCode){
-        document.body.innerHTML += "<p style='color:red;margin-top:20px'>未识别到邀请码！</p>";
+        errorDom.innerText = "未识别到邀请码！";
         return;
     }
 
     const randomDomain = getRandomDomain();
     const targetUrl = `${randomDomain}/register.php?invite=${inviteCode}`;
 
-    // 设置手动链接兜底
-    const linkDom = document.getElementById('manualLink');
+    // 显示手动跳转链接
     linkDom.href = targetUrl;
     linkDom.style.display = "block";
+    linkDom.innerText = targetUrl;
 
-    // 原生跳转，最大限度避免拦截
+    // 原生跳转，微信/浏览器不易拦截
     window.location.href = targetUrl;
 })();
 </script>
