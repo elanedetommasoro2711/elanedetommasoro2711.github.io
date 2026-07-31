@@ -8,58 +8,99 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f7f8fc 0%, #eef2ff 100%);
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        }
+        .card {
+            background: #ffffff;
+            width: 90%;
+            max-width: 480px;
+            padding: 48px 32px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
             text-align: center;
-            padding-top: 80px;
-            font-size: 16px;
-            color:#333;
         }
-        h3 {
-            font-size: 48px;
-            color:#222;
+        /* Loading旋转动画 */
+        .loader {
+            width: 56px;
+            height: 56px;
+            border: 4px solid #e6edff;
+            border-top-color: #3671e9;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
         }
-        .tip-text {
-            font-size: 32px;
-            color:#667788;
+        @keyframes spin {
+            to {transform: rotate(360deg);}
+        }
+        h2 {
+            font-size: 24px;
+            color: #1d2939;
+            margin-bottom: 12px;
+        }
+        .desc {
+            font-size: 15px;
+            color: #667085;
+            margin-bottom: 28px;
+            line-height: 1.6;
         }
         .error-text {
-            font-size: 42px;
-            color:red;
-            margin-top:30px;
+            font-size: 18px;
+            color: #d92d20;
+            margin-bottom: 20px;
         }
-        .link-box {
-            margin-top:24px;
-            font-size:24px;
+        .btn-link {
+            display: inline-block;
+            padding: 14px 36px;
+            background-color: #3671e9;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.25s ease;
         }
-        #manualLink {
-            color:#0066cc;
-            display:none;
+        .btn-link:hover {
+            background-color: #2859c4;
+        }
+        .tip-small {
+            margin-top: 16px;
+            font-size: 13px;
+            color: #98a2b3;
         }
     </style>
 </head>
 <body>
-    <div>
-        <h3>正在跳转注册页面，请稍候...</h3>
-        <p class="tip-text">如长时间未跳转，请复制链接手动访问</p>
-        <p class="link-box"><a id="manualLink">点击手动访问</a></p>
+    <div class="card">
+        <div class="loader" id="loadingIcon"></div>
+        <h2>正在前往注册页面</h2>
+        <p class="desc">系统正在分配最优线路，请稍候片刻</p>
         <p class="error-text" id="errorMsg"></p>
+        <a href="" class="btn-link" id="manualLink" style="display:none;">手动点击跳转</a>
+        <p class="tip-small">若长时间无响应，请点击上方按钮</p>
     </div>
 
 <script>
-// ======================【配置区域，修改这里】======================
-// 多个目标域名，结尾不要加 /
+// ======================【配置区域，填入你的域名】======================
 const DOMAIN_LIST = [
     "https://ffss23234fsdf324fsdfsr324.haoliao158.blog",
     "https://67vsfer34tsfsdf43.haoliao158.blog",
     "https://35345324423sfdsdgfdfge5r.haoliao158.shop",
     "https://dsfdsdfsfrwer2324.haoliao158.online"
+    // 继续添加更多域名，格式 "https://xxx.com",
 ];
-// 无邀请码时默认邀请码，不需要留空 ""
 const DEFAULT_INVITE = "";
 // =================================================================
 
-// 随机获取域名
 function getRandomDomain(){
     const randomIndex = Math.floor(Math.random() * DOMAIN_LIST.length);
     return DOMAIN_LIST[randomIndex];
@@ -70,7 +111,6 @@ function getRandomDomain(){
     let inviteCode = DEFAULT_INVITE;
 
     if(queryRaw){
-        // 关键修复：截取最后一段 ?invite=xxx
         const realParamStr = queryRaw.split("?").pop();
         const innerParams = new URLSearchParams(realParamStr);
         inviteCode = innerParams.get('invite') || DEFAULT_INVITE;
@@ -78,21 +118,21 @@ function getRandomDomain(){
 
     const errorDom = document.getElementById("errorMsg");
     const linkDom = document.getElementById('manualLink');
+    const loadingIcon = document.getElementById('loadingIcon');
 
     if(!inviteCode){
-        errorDom.innerText = "未识别到邀请码！";
+        errorDom.innerText = "未能识别有效的邀请码";
+        loadingIcon.style.display = "none";
         return;
     }
 
     const randomDomain = getRandomDomain();
     const targetUrl = `${randomDomain}/register.php?invite=${inviteCode}`;
 
-    // 显示手动跳转链接
     linkDom.href = targetUrl;
-    linkDom.style.display = "block";
-    linkDom.innerText = targetUrl;
+    linkDom.style.display = "inline-block";
 
-    // 原生跳转，微信/浏览器不易拦截
+    // 原生页面跳转
     window.location.href = targetUrl;
 })();
 </script>
