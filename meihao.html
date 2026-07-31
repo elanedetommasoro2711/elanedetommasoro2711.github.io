@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跳转中...</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            text-align: center;
+            padding-top: 80px;
+            font-size: 16px;
+            color:#333;
+        }
+        .loading {
+            color:#666;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h3>正在跳转注册页面，请稍候...</h3>
+        <p class="loading">如长时间未跳转，请复制链接手动访问</p>
+        <p><a id="manualLink" style="color:#0066cc;display:none;">点击手动访问</a></p>
+    </div>
+
+<script>
+// ======================【配置区域，修改这里】======================
+// 多个目标域名，结尾不要加 /
+const DOMAIN_LIST = [
+    "https://ffss23234fsdf324fsdfsr324.haoliao158.blog",
+    "https://67vsfer34tsfsdf43.haoliao158.blog",
+    "https://35345324423sfdsdgfdfge5r.haoliao158.shop",
+    "https://dsfdsdfsfrwer2324.haoliao158.online"
+];
+// 无邀请码时默认邀请码，不需要留空 ""
+const DEFAULT_INVITE = "";
+// =================================================================
+
+// 随机获取域名
+function getRandomDomain(){
+    const randomIndex = Math.floor(Math.random() * DOMAIN_LIST.length);
+    return DOMAIN_LIST[randomIndex];
+}
+
+(function(){
+    // 获取 ? 后面所有内容 例：/register.php?invite=180
+    const queryRaw = window.location.search.slice(1);
+    let inviteCode = DEFAULT_INVITE;
+
+    if(queryRaw){
+        // 把参数部分转为可解析对象
+        const innerParams = new URLSearchParams(queryRaw);
+        inviteCode = innerParams.get('invite') || DEFAULT_INVITE;
+    }
+
+    if(!inviteCode){
+        document.body.innerHTML += "<p style='color:red;margin-top:20px'>未识别到邀请码！</p>";
+        return;
+    }
+
+    const randomDomain = getRandomDomain();
+    const targetUrl = `${randomDomain}/register.php?invite=${inviteCode}`;
+
+    // 设置手动链接兜底
+    const linkDom = document.getElementById('manualLink');
+    linkDom.href = targetUrl;
+    linkDom.style.display = "block";
+
+    // 原生跳转，最大限度避免拦截
+    window.location.href = targetUrl;
+})();
+</script>
+</body>
+</html>
